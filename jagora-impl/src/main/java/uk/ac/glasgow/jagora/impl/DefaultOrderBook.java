@@ -1,9 +1,6 @@
 package uk.ac.glasgow.jagora.impl;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 import uk.ac.glasgow.jagora.Order;
 import uk.ac.glasgow.jagora.OrderBook;
@@ -25,44 +22,57 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 	 */
 	public DefaultOrderBook(World world) {
 		this.backing = new PriorityQueue<TickEvent<O>>(new OrderBookComparator());
-		//TODO
+		this.world = world;
 	}
 	
 	@Override
 	public void recordOrder(O order) {
-		//TODO
+		backing.add(world.createTickEvent(order));
 	}
 
 	@Override
 	public void cancelOrder(O order) {
-		//TODO
+		for (TickEvent<O> tickEvent : backing) {
+			Order o = tickEvent.getEvent();
+			if (o.equals(order)) {
+				backing.remove(tickEvent);
+				return;
+			}
+		}
 	}
 
 	@Override
 	public O getBestOrder() {
-		//TODO
-		return null;
+		return backing.peek().getEvent();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<TickEvent<O>> getOrdersAsList() {
-		//TODO
-		return null;
+		List list = new ArrayList<>();
+		for (TickEvent<O> t : backing) {
+			list.add(t);
+		}
+		return list;
 	}
 	
 	private class OrderBookComparator implements Comparator<TickEvent<O>> {
 
 		@Override
 		public int compare(TickEvent<O> tickEvent1, TickEvent<O> tickEvent2) {
-			//TODO
-			return 0;
+			int score = tickEvent1.getEvent().compareTo(tickEvent2.getEvent());
+			if (score == 0) {
+				return tickEvent1.getTick().compareTo(tickEvent2.getTick());
+			}
+			else {
+				return score;
+			}
 		}
 	}
 	
 	@Override
 	public String toString (){
-		// TODO
-		return null;
+		return backing.toString();
 	}
 
 }
