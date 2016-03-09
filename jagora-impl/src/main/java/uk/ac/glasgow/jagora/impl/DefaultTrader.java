@@ -1,11 +1,9 @@
 package uk.ac.glasgow.jagora.impl;
 
+import java.util.HashMap;
 import java.util.Set;
 
-import uk.ac.glasgow.jagora.Stock;
-import uk.ac.glasgow.jagora.StockExchange;
-import uk.ac.glasgow.jagora.TradeException;
-import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.*;
 
 /**
  * Implements a trader with behaviours for satisfying trades, but never speaks
@@ -18,8 +16,7 @@ public class DefaultTrader implements Trader {
 	
 	private String name;
 	private Double cash;
-	private Stock stock;
-	private Integer quantity;
+	private HashMap<Stock, Integer> inventory = new HashMap<>();
 
 	/**
 	 * Constructs a new instance of default trader with the specified cash and a
@@ -31,51 +28,57 @@ public class DefaultTrader implements Trader {
 	 * @param quantity
 	 */
 	public DefaultTrader(String name, Double cash, Stock stock, Integer quantity) {
-		// TODO Auto-generated constructor stub
+		this.name = name;
+		this.cash = cash;
+		this.inventory.put(stock,quantity);
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
 	public Double getCash() {
-		// TODO Auto-generated method stub
-		return null;
+		return cash;
 	}
 
 	@Override
-	public void sellStock(Stock stock, Integer quantity, Double price)
-			throws TradeException {
-		// TODO Auto-generated method stub
-
+	public void sellStock(Stock stock, Integer quantity, Double price) throws TradeException {
+		if(inventory.containsKey(stock)){
+			int amount = inventory.get(stock);
+			if(amount - quantity >= 0){
+				cash += quantity * price;
+				inventory.replace(stock, amount - quantity);
+			}else throw new TradeException("Seller not enough stock.", this);
+		}else throw new TradeException("Seller not enough stock.", this);
 	}
 
 	@Override
-	public void buyStock(Stock stock, Integer quantity, Double price)
-			throws TradeException {
-		// TODO Auto-generated method stub
-
+	public void buyStock(Stock stock, Integer quantity, Double price) throws TradeException {
+		if(cash - (quantity * price) >= 0){
+			cash -= quantity * price;
+			if(inventory.containsKey(stock)){
+				inventory.replace(stock, inventory.get(stock) + quantity);
+			}else inventory.put(stock, quantity);
+		}else throw new TradeException("Buyer not enough cash.", this);
 	}
 
 	@Override
 	public Integer getInventoryHolding(Stock stock) {
-		// TODO Auto-generated method stub
-		return null;
+		if(inventory.containsKey(stock))return inventory.get(stock);
+		return 0;
 	}
 
 	@Override
 	public void speak(StockExchange stockExchange) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public Set<Stock> getTradingStocks() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Stock> stockSet = inventory.keySet();
+		return stockSet;
 	}
 
 }

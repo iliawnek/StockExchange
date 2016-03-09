@@ -8,29 +8,26 @@ public class DefaultTickEvent<T> implements TickEvent<T> {
 	private Long tick;
 	
 	public DefaultTickEvent(T event, Long tick) {
-
+		this.event = event;
+		this.tick = tick;
 	}
 
 	@Override
 	public int compareTo(TickEvent<T> tickEvent) {
-		//TODO
-		return 0;
+		return tick.compareTo(tickEvent.getTick());
 	}
 
 	@Override
 	public T getEvent() {
-		//TODO
-		return null;
+		return event;
 	}
 
 	@Override
 	public Long getTick() {
-		//TODO
-		return null;
+		return tick;
 	}
-	
+
 	public String toString(){
-		//TODO
-		return null;
+		return "Tick: " + tick + "\nEvent: " + event;
 	}
 }

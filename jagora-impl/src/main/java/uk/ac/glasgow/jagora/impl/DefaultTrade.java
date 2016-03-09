@@ -18,36 +18,43 @@ public class DefaultTrade implements Trade {
 	private Double price;
 
 	public DefaultTrade(World world, BuyOrder buyOrder, SellOrder sellOffer, Stock stock, Integer quantity, Double price) {
-		//TODO
+		this.world = world;
+		this.buyOrder = buyOrder;
+		this.sellOrder = sellOffer;
+		this.stock = stock;
+		this.quantity = quantity;
+		this.price = price;
 	}
 
 	@Override
 	public Stock getStock() {
-		//TODO
-		return null;
+		return stock;
 	}
 
 	@Override
 	public Integer getQuantity() {
-		//TODO
-		return null;
+		return quantity;
 	}
 
 	@Override
 	public Double getPrice() {
-		//TODO
-		return null;
+		return price;
 	}
 
+
+	/**
+	 *
+	 * @return a tick event recording the time that the trade was completed.
+	 * @throws TradeException
+	 *             if the application of the proposed trade was invalid for
+	 *             either the buy or sell order; or if the trade could not be
+	 *             satisfied by the associated buying or selling traders.
+	 */
 	@Override
-	public TickEvent<Trade> execute() throws TradeException {		
-		//TODO
-		return null;
+	public TickEvent<Trade> execute() throws TradeException {
+		TickEvent<Trade> te = world.createTickEvent(this);
+		buyOrder.satisfyTrade(te);
+		sellOrder.satisfyTrade(te);
+		return te;
 	}
-	
-	public String toString(){
-		//TODO
-		return null;
-	}
-
 }

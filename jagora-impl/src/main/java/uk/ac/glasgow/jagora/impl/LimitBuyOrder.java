@@ -1,11 +1,6 @@
 package uk.ac.glasgow.jagora.impl;
 
-import uk.ac.glasgow.jagora.BuyOrder;
-import uk.ac.glasgow.jagora.Stock;
-import uk.ac.glasgow.jagora.TickEvent;
-import uk.ac.glasgow.jagora.Trade;
-import uk.ac.glasgow.jagora.TradeException;
-import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.*;
 
 public class LimitBuyOrder implements BuyOrder {
 	
@@ -15,56 +10,60 @@ public class LimitBuyOrder implements BuyOrder {
 	private Double price;
 
 	public LimitBuyOrder(Trader trader, Stock stock, Integer quantity, Double price) {
-		//TODO
+		this.trader = trader;
+		this.stock = stock;
+		this.quantity = quantity;
+		this.price = price;
 	}
 
 	@Override
 	public Double getPrice() {
-		//TODO
-		return null;
-	}
-	
-	public String toString(){
-		//TODO
-		return null;
+		return price;
 	}
 
 	@Override
 	public Trader getTrader() {
-		// TODO Auto-generated method stub
-		return null;
+		return trader;
 	}
 
 	@Override
 	public Stock getStock() {
-		// TODO Auto-generated method stub
-		return null;
+		return stock;
 	}
 
 	@Override
 	public Integer getRemainingQuantity() {
-		// TODO Auto-generated method stub
-		return null;
+		return quantity;
 	}
 
 	@Override
 	public void satisfyTrade(TickEvent<Trade> tradeEvent) throws TradeException {
-		// TODO Auto-generated method stub
-		
+		Double tradePrice = tradeEvent.getEvent().getPrice();
+		Integer tradeQuantity = tradeEvent.getEvent().getQuantity();
+		trader.buyStock(tradeEvent.getEvent().getStock(), tradeQuantity, tradePrice);
+		quantity -= tradeQuantity;
 	}
 
 	@Override
-	public void rollBackTrade(TickEvent<Trade> tradeEvent)
-			throws TradeException {
-		// TODO Auto-generated method stub
-		
+	public void rollBackTrade(TickEvent<Trade> tradeEvent) throws TradeException {
+		Double tradePrice = tradeEvent.getEvent().getPrice();
+		Integer tradeQuantity = tradeEvent.getEvent().getQuantity();
+		trader.sellStock(tradeEvent.getEvent().getStock(), tradeQuantity, tradePrice);
+		quantity += tradeQuantity;
 	}
+
+    @Override
+    public boolean equals(Object order) {
+        if(order instanceof  Order) {
+            Order o = (Order) order;
+            if(o.getPrice() == null || price == null) return (o.getPrice() == price && o.getStock().getName().equals(stock.getName()) && o.getRemainingQuantity() == quantity);
+            return (o.getPrice().equals(price) && o.getStock().getName().equals(stock.getName()) && o.getRemainingQuantity() == quantity);
+        }else return false;
+    }
 
 	@Override
 	public int compareTo(BuyOrder order) {
-		// TODO Auto-generated method stub
-		return 0;
+        if(price == null || order.getPrice() == null) return 0;
+		return order.getPrice().compareTo(price);
 	}
-
-
 }

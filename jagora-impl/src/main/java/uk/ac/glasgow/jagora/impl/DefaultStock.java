@@ -7,19 +7,17 @@ public class DefaultStock implements Stock{
 	private String name;
 	
 	public DefaultStock(String name){
-		//TODO
+		this.name = name;
 	}
 
 	@Override
 	public String getName() {
-		//TODO
-		return null;
+		return name;
 	}
 	
 	@Override
 	public String toString(){
-		//TODO
-		return null;
+		return name;
 	}
 
 }
