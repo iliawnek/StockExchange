@@ -32,13 +32,15 @@ public class ContinuousOrderDrivenMarket implements Market {
 	 * @param world
 	 */
 	public ContinuousOrderDrivenMarket(Stock stock, World world) {
-		//TODO
+		this.stock = stock;
+		this.world = world;
+		sellBook = new DefaultOrderBook<>(world);
+		buyBook = new DefaultOrderBook<>(world);
 	}
 
 	@Override
 	public Stock getStock() {
-		//TODO
-		return null;
+		return stock;
 	}
 
 	@Override
@@ -49,34 +51,32 @@ public class ContinuousOrderDrivenMarket implements Market {
 
 	@Override
 	public void placeBuyOrder(BuyOrder buyOrder) {
-		//TODO
+		buyBook.recordOrder(buyOrder);
 	}
 
 	@Override
 	public void placeSellOrder(SellOrder sellOrder) {
-		//TODO
+		sellBook.recordOrder(sellOrder);
 	}
 
 	@Override
 	public void cancelBuyOrder(BuyOrder buyOrder) {
-		//TODO
+		buyBook.cancelOrder(buyOrder);
 	}
 
 	@Override
 	public void cancelSellOrder(SellOrder sellOrder) {
-		//TODO
+		sellBook.cancelOrder(sellOrder);
 	}
 
 	@Override
 	public Double getBestBid() {
-		//TODO
-		return null;
+		return buyBook.getBestOrder().getPrice();
 	}
 
 	@Override
 	public Double getBestOffer() {
-		//TODO
-		return null;
+		return sellBook.getBestOrder().getPrice();
 	}
 	
 	@Override
