@@ -81,7 +81,6 @@ public class ContinuousOrderDrivenMarket implements Market {
 	
 	@Override
 	public String toString(){
-		//TODO
-		return null;
+		return String.format("%s market\nbuy orders: %s\nsell orders: %s", stock, buyBook, sellBook);
 	}
 }
