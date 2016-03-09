@@ -1,7 +1,6 @@
 package uk.ac.glasgow.jagora.impl;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import uk.ac.glasgow.jagora.BuyOrder;
 import uk.ac.glasgow.jagora.Market;
@@ -14,54 +13,74 @@ import uk.ac.glasgow.jagora.World;
 
 public class DefaultStockExchange implements StockExchange {
 
-	private Map<Stock,Market> markets;
-	private World world;
-	private List<TickEvent<Trade>> tradeHistory;
-	
-	public DefaultStockExchange(World world){
-	}
-	
-	@Override
-	public void doClearing() {
-		//TODO
-	}
+    private Map<Stock, Market> markets;
+    private World world;
+    private List<TickEvent<Trade>> tradeHistory;
 
-	@Override
-	public void placeBuyOrder(BuyOrder buyOrder) {
-		//TODO
-	}
+    public DefaultStockExchange(World world) {
+        this.world = world;
+        markets = new HashMap<>();
+        tradeHistory = new ArrayList<>();
+    }
 
-	@Override
-	public void placeSellOrder(SellOrder sellOrder) {
-		//TODO
-	}
+    @Override
+    public void doClearing() {
+        for (Map.Entry<Stock, Market> entry : markets.entrySet()) {
+            tradeHistory.addAll(entry.getValue().doClearing());
+        }
+    }
 
-	@Override
-	public void cancelBuyOrder(BuyOrder buyOrder) {
-		//TODO
-	}
+    @Override
+    public void placeBuyOrder(BuyOrder buyOrder) {
+        Market market = markets.get(buyOrder.getStock());
+        if (market == null) return;
+        market.placeBuyOrder(buyOrder);
+    }
 
-	@Override
-	public void cancelSellOrder(SellOrder sellOrder) {
-		//TODO
-	}
-	
-	@Override
-	public Double getBestOffer(Stock stock) {
-		//TODO
-		return null;
-	}
+    @Override
+    public void placeSellOrder(SellOrder sellOrder) {
+        Market market = markets.get(sellOrder.getStock());
+        if (market == null) return;
+        market.placeSellOrder(sellOrder);
+    }
 
-	@Override
-	public Double getBestBid(Stock stock) {
-		//TODO
-		return null;
-	}
-	
-	@Override
-	public List<TickEvent<Trade>> getTradeHistory(Stock stock) {
-		//TODO
-		return null;
-	}
+    @Override
+    public void cancelBuyOrder(BuyOrder buyOrder) {
+        Market market = markets.get(buyOrder.getStock());
+        if (market == null) return;
+        market.cancelBuyOrder(buyOrder);
+    }
+
+    @Override
+    public void cancelSellOrder(SellOrder sellOrder) {
+        Market market = markets.get(sellOrder.getStock());
+        if (market == null) return;
+        market.cancelSellOrder(sellOrder);
+    }
+
+    @Override
+    public Double getBestOffer(Stock stock) {
+        Market market = markets.get(stock);
+        if (market == null) return 0.0;
+        return market.getBestOffer();
+    }
+
+    @Override
+    public Double getBestBid(Stock stock) {
+        Market market = markets.get(stock);
+        if (market == null) return 0.0;
+        return market.getBestBid();
+    }
+
+    @Override
+    public List<TickEvent<Trade>> getTradeHistory(Stock stock) {
+        List<TickEvent<Trade>> stockTradeHistory = new ArrayList<>();
+        for (TickEvent<Trade> te : tradeHistory) {
+            if (te.getEvent().getStock() == stock) {
+                stockTradeHistory.add(te);
+            }
+        }
+        return stockTradeHistory;
+    }
 
 }

@@ -21,7 +21,7 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 	 * @param world
 	 */
 	public DefaultOrderBook(World world) {
-		this.backing = new PriorityQueue<TickEvent<O>>(new OrderBookComparator());
+		this.backing = new PriorityQueue<>(new OrderBookComparator());
 		this.world = world;
 	}
 	
@@ -43,17 +43,23 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 
 	@Override
 	public O getBestOrder() {
-		return backing.peek().getEvent();
+		TickEvent<O> tickEvent = backing.peek();
+		if (tickEvent == null) {
+			return null;
+		}
+		else {
+			return tickEvent.getEvent();
+		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<TickEvent<O>> getOrdersAsList() {
-		List list = new ArrayList<>();
-		for (TickEvent<O> t : backing) {
-			list.add(t);
+		ArrayList<TickEvent<O>> orders = new ArrayList<>();
+
+		for (TickEvent<O> tickEvent : backing) {
+			orders.add(tickEvent);
 		}
-		return list;
+		return orders;
 	}
 	
 	private class OrderBookComparator implements Comparator<TickEvent<O>> {

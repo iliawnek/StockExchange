@@ -1,16 +1,10 @@
 package uk.ac.glasgow.jagora.impl;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.glasgow.jagora.BuyOrder;
-import uk.ac.glasgow.jagora.Market;
-import uk.ac.glasgow.jagora.OrderBook;
-import uk.ac.glasgow.jagora.SellOrder;
-import uk.ac.glasgow.jagora.Stock;
-import uk.ac.glasgow.jagora.TickEvent;
-import uk.ac.glasgow.jagora.Trade;
-import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.*;
 
 /**
  * Provides the behaviour of a continuous order driven market.
@@ -45,8 +39,39 @@ public class ContinuousOrderDrivenMarket implements Market {
 
 	@Override
 	public List<TickEvent<Trade>> doClearing() {
-		//TODO
-		return null;		
+		List<TickEvent<Trade>> executedTrades = new ArrayList<>();
+
+		BuyOrder buyOrder;
+		SellOrder sellOrder;
+
+		while (true) {
+			buyOrder = buyBook.getBestOrder();
+			sellOrder = sellBook.getBestOrder();
+
+			if (buyOrder == null) break;
+			if (sellOrder == null) break;
+			if (getBestBid() < getBestOffer()) break;
+
+			double price = sellOrder.getPrice();
+			int quantity = Math.min(buyOrder.getRemainingQuantity(), sellOrder.getRemainingQuantity());
+
+			Trade trade = new DefaultTrade(world, buyOrder, sellOrder, stock, quantity, price);
+			try {
+				executedTrades.add(trade.execute());
+			}
+			catch (TradeException e) {
+				e.printStackTrace();
+			}
+
+			if (buyOrder.getRemainingQuantity() == 0) {
+				cancelBuyOrder(buyOrder);
+			}
+			if (sellOrder.getRemainingQuantity() == 0) {
+				cancelSellOrder(sellOrder);
+			}
+		}
+
+		return executedTrades;
 	}
 
 	@Override
