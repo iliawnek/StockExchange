@@ -18,18 +18,26 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 	
 	/**
 	 * Constructs a new instance of the order book synchronized to the ticks of the specified world.
-	 * @param world
+	 * @param world which controls this order book's timing events.
 	 */
 	public DefaultOrderBook(World world) {
 		this.backing = new PriorityQueue<>(new OrderBookComparator());
 		this.world = world;
 	}
-	
+
+	/**
+	 * Adds an order to the order book.
+	 * @param order to be recorded.
+     */
 	@Override
 	public void recordOrder(O order) {
 		backing.add(world.createTickEvent(order));
 	}
 
+	/**
+	 * Removes an order from the order book.
+	 * @param order to be cancelled.
+     */
 	@Override
 	public void cancelOrder(O order) {
 		for (TickEvent<O> tickEvent : backing) {
@@ -41,6 +49,11 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 		}
 	}
 
+	/**
+	 * Best order is determined by the compareTo() method of the orders.
+	 * If order price comparison fails, ties are broken by time placed.
+	 * @return the best order in the order book.
+     */
 	@Override
 	public O getBestOrder() {
 		TickEvent<O> tickEvent = backing.peek();
@@ -52,11 +65,13 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 		}
 	}
 
+	/**
+	 * @return a sorted list of the orders in the order book.
+     */
 	@Override
 	public List<TickEvent<O>> getOrdersAsList() {
 		return new ArrayList<>(backing);
 	}
-	
 	private class OrderBookComparator implements Comparator<TickEvent<O>> {
 
 		@Override
@@ -70,7 +85,7 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString (){
 		return backing.toString();

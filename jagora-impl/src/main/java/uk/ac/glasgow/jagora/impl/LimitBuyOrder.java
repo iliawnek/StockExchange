@@ -31,11 +31,19 @@ public class LimitBuyOrder implements BuyOrder {
 		return stock;
 	}
 
+	/**
+	 * @return the remaining quantity of stock still to be purchased.
+     */
 	@Override
 	public Integer getRemainingQuantity() {
 		return quantity;
 	}
 
+	/**
+	 * Attempts to make a trade.
+	 * @param tradeEvent to be attempted.
+	 * @throws TradeException if the trade is unsuccessful.
+     */
 	@Override
 	public void satisfyTrade(TickEvent<Trade> tradeEvent) throws TradeException {
 		Double tradePrice = tradeEvent.getEvent().getPrice();
@@ -44,6 +52,11 @@ public class LimitBuyOrder implements BuyOrder {
 		quantity -= tradeQuantity;
 	}
 
+	/**
+	 * Rolls back a previously initiated trade.
+	 * @param tradeEvent to be rolled back.
+	 * @throws TradeException if the roll back is unsuccessful.
+     */
 	@Override
 	public void rollBackTrade(TickEvent<Trade> tradeEvent) throws TradeException {
 		Double tradePrice = tradeEvent.getEvent().getPrice();
