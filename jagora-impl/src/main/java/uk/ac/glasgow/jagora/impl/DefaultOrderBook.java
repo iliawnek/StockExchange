@@ -54,12 +54,7 @@ public class DefaultOrderBook<O extends Order & Comparable<O>> implements OrderB
 
 	@Override
 	public List<TickEvent<O>> getOrdersAsList() {
-		ArrayList<TickEvent<O>> orders = new ArrayList<>();
-
-		for (TickEvent<O> tickEvent : backing) {
-			orders.add(tickEvent);
-		}
-		return orders;
+		return new ArrayList<>(backing);
 	}
 	
 	private class OrderBookComparator implements Comparator<TickEvent<O>> {
