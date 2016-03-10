@@ -55,6 +55,18 @@ public class ContinuousOrderDrivenMarket implements Market {
 			double price = sellOrder.getPrice();
 			int quantity = Math.min(buyOrder.getRemainingQuantity(), sellOrder.getRemainingQuantity());
 
+			if (sellOrder.getRemainingQuantity() >
+                    sellOrder.getTrader().getInventoryHolding(sellOrder.getStock())) {
+                cancelSellOrder(sellOrder);
+                continue;
+            }
+
+            if (buyOrder.getPrice() >
+                    buyOrder.getTrader().getCash()) {
+                cancelBuyOrder(buyOrder);
+                continue;
+            }
+
 			Trade trade = new DefaultTrade(world, buyOrder, sellOrder, stock, quantity, price);
 			try {
 				executedTrades.add(trade.execute());
@@ -96,12 +108,16 @@ public class ContinuousOrderDrivenMarket implements Market {
 
 	@Override
 	public Double getBestBid() {
-		return buyBook.getBestOrder().getPrice();
+		Order order = buyBook.getBestOrder();
+		if (order == null) return null;
+		return order.getPrice();
 	}
 
 	@Override
 	public Double getBestOffer() {
-		return sellBook.getBestOrder().getPrice();
+		Order order = sellBook.getBestOrder();
+		if (order == null) return null;
+		return order.getPrice();
 	}
 	
 	@Override

@@ -32,15 +32,23 @@ public class DefaultStockExchange implements StockExchange {
 
     @Override
     public void placeBuyOrder(BuyOrder buyOrder) {
-        Market market = markets.get(buyOrder.getStock());
-        if (market == null) return;
+        Stock stock = buyOrder.getStock();
+        Market market = markets.get(stock);
+        if (market == null) {
+            market = new ContinuousOrderDrivenMarket(stock, world);
+            markets.put(stock, market);
+        }
         market.placeBuyOrder(buyOrder);
     }
 
     @Override
     public void placeSellOrder(SellOrder sellOrder) {
-        Market market = markets.get(sellOrder.getStock());
-        if (market == null) return;
+        Stock stock = sellOrder.getStock();
+        Market market = markets.get(stock);
+        if (market == null) {
+            market = new ContinuousOrderDrivenMarket(stock, world);
+            markets.put(stock, market);
+        }
         market.placeSellOrder(sellOrder);
     }
 
@@ -61,14 +69,14 @@ public class DefaultStockExchange implements StockExchange {
     @Override
     public Double getBestOffer(Stock stock) {
         Market market = markets.get(stock);
-        if (market == null) return 0.0;
+        if (market == null) return null;
         return market.getBestOffer();
     }
 
     @Override
     public Double getBestBid(Stock stock) {
         Market market = markets.get(stock);
-        if (market == null) return 0.0;
+        if (market == null) return null;
         return market.getBestBid();
     }
 
